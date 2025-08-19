@@ -3,9 +3,10 @@ spring:
     name: user-service
 
   datasource:
-    url: jdbc:mysql://172.20.10.2:3306/bizzcart_user_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: sumit
-    password: sumit
+    url: jdbc:mysql://host.docker.internal:3306/bizzcart_user_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: bizzcart_user
+    password: bizzcart_pass
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
