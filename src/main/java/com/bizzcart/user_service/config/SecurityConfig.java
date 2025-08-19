@@ -32,13 +32,15 @@ public class SecurityConfig {
                 // ✅ We disable it here because we're building a stateless REST API (JWT-based).
                 // 🔺 If you REMOVE this line: You may get 403 errors when sending POST/PUT requests without CSRF token.
                 .csrf(csrf -> csrf.disable())
-
                 // ✅ This line defines URL patterns that don’t require authentication.
                 // 🔺 If you REMOVE this line: Even your `/api/auth/login` will require authentication, leading to 401 errors.
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/users/signup/**").permitAll()
 
-                        // ✅ All other requests must be authenticated (i.e., must include a valid JWT).
-                        // 🔺 If you REMOVE this line: All endpoints will be open to public, even protected ones.
+                        // ✅ Allow anyone (no authentication needed) to access user signup endpoints
+                        .requestMatchers("/users/signup/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+// ✅ Allow anyone to access the find-by-email endpoint (works with query params)
+                        .requestMatchers("/users/findByEmail").permitAll()
 
                         .anyRequest().authenticated())
 
