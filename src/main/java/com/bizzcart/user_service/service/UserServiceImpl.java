@@ -2,12 +2,14 @@ package com.bizzcart.user_service.service;
 
 import com.bizzcart.user_service.constant.Role;
 import com.bizzcart.user_service.dto.User;
+import com.bizzcart.user_service.exception.ResourceNotFoundException;
 import com.bizzcart.user_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -20,11 +22,15 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public String registerUser(User user) {
-        
+    public User registerUser(User user) {
         // Check if email already exists
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already registered");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
+        }
+
+        // Check if phone already exists
+        if (userRepository.findByPhone(user.getPhone()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already registered");
         }
 
         // Encode password before saving
@@ -35,16 +41,14 @@ public class UserServiceImpl implements UserService {
             user.setRole(Role.USER);
         }
 
-        // Save user
-        userRepository.save(user);
-
-        return "User registered successfully";
+        // Save and return user entity
+        return userRepository.save(user);
     }
 
     @Override
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 
 }
